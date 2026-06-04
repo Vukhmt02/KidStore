@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using KidStore.Domain.Exceptions;
 
 namespace KidStore.Application.Services
 {
@@ -46,7 +47,7 @@ namespace KidStore.Application.Services
             var category = await _categoryRepository.GetByIdAsync(id);
 
             if (category == null)
-                return;
+                throw new NotFoundException("Danh mục", id);
 
             category.Name = dto.Name;
             
@@ -60,7 +61,7 @@ namespace KidStore.Application.Services
             var category = await _categoryRepository.GetByIdAsync(id);
 
             if (category == null)
-                return;
+                throw new NotFoundException("Danh mục", id);
 
             await _categoryRepository.DeleteAsync(category);
         }

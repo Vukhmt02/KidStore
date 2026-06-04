@@ -25,6 +25,9 @@ namespace KidStore.Infrastructure.Repositories;
             return await _context.Products
                 .Include(x => x.Category)
                 .Include(x => x.Variants)
+                    .ThenInclude(x => x.Size)
+                .Include(x => x.Variants)
+                    .ThenInclude(x => x.Color)
                 .Include(x => x.Images)
                 .ToListAsync();
         }
@@ -34,6 +37,9 @@ namespace KidStore.Infrastructure.Repositories;
             return await _context.Products
                 .Include(x => x.Category)
                 .Include(x => x.Variants)
+                    .ThenInclude(x => x.Size)
+                .Include(x => x.Variants)
+                    .ThenInclude(x => x.Color)
                 .Include(x => x.Images)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }

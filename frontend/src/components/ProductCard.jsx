@@ -1,11 +1,25 @@
 import { Heart, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { formatCurrency } from "../utils/formatCurrency";
 import Button from "./Button";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(product);
+    } catch (error) {
+      if (error.message === "LOGIN_REQUIRED" || error.status === 401) {
+        navigate("/login", { state: { message: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng." } });
+        return;
+      }
+
+      navigate(`/products/${product.id}`);
+    }
+  };
 
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-cocoa/10 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-soft">
@@ -38,7 +52,7 @@ export default function ProductCard({ product }) {
         </Link>
         <div className="mt-3 flex items-center justify-between gap-3">
           <p className="text-lg font-extrabold text-berry">{formatCurrency(product.price)}</p>
-          <Button size="sm" onClick={() => addToCart(product)} aria-label="Thêm vào giỏ">
+          <Button size="sm" onClick={handleAddToCart} aria-label="Thêm vào giỏ">
             <ShoppingBag size={16} />
           </Button>
         </div>

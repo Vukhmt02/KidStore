@@ -29,6 +29,12 @@ public class ChangePasswordDto
     public string ConfirmNewPassword { get; set; } = string.Empty;
 }
 
+public class UpdateProfileDto
+{
+    public string? PhoneNumber { get; set; }
+    public string? Address { get; set; }
+}
+
 // ── Response DTOs ─────────────────────────────────────────────
 
 public class AuthResponseDto

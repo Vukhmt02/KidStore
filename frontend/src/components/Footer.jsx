@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-white/60">
-        © 2026 KidStore. Front-end demo.
+        © 2026 KidStore. Giao diện minh họa.
       </div>
     </footer>
   );

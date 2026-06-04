@@ -82,7 +82,7 @@ export default function Cart() {
           </div>
           <Link to="/checkout">
             <Button className="mt-6 w-full" size="lg">
-              Checkout
+              Thanh toán
             </Button>
           </Link>
         </aside>

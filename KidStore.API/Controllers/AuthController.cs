@@ -6,14 +6,12 @@ using KidStore.API.Extensions;
 //using KidStore.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace KidStore.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 [Produces("application/json")]
-[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -121,6 +119,17 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateMe([FromBody] UpdateProfileDto dto)
+    {
+        var userId = User.GetUserId();
+        var result = await _authService.UpdateProfileAsync(userId, dto);
+        return Ok(result);
+    }
+
     // ─────────────────────────────────────────────────────────────
     // PUT /api/auth/change-password
     // ─────────────────────────────────────────────────────────────
@@ -160,10 +169,5 @@ public class AuthController : ControllerBase
             return forwarded.FirstOrDefault()?.Split(',')[0].Trim();
 
         return HttpContext.Connection.RemoteIpAddress?.ToString();
-    }
-
-    private string GetDebuggerDisplay()
-    {
-        return ToString();
     }
 }

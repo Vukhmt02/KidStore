@@ -13,5 +13,21 @@ export const authService = {
       body: JSON.stringify(data)
     }),
 
-  getCurrentUser: () => apiRequest("/auth/me")
+  refresh: () =>
+    apiRequest("/auth/refresh", {
+      method: "POST"
+    }),
+
+  logout: () =>
+    apiRequest("/auth/logout", {
+      method: "POST"
+    }),
+
+  getCurrentUser: () => apiRequest("/auth/me"),
+
+  updateProfile: (data) =>
+    apiRequest("/auth/me", {
+      method: "PUT",
+      body: JSON.stringify(data)
+    })
 };

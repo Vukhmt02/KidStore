@@ -25,5 +25,8 @@ namespace KidStore.Domain.Entities
         public Size? Size { get; set; }
 
         public Color? Color { get; set; }
+
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

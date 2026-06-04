@@ -1,17 +1,87 @@
 import { BarChart3, Boxes, FolderTree, Home, LogOut, Menu, Package, ShoppingCart, Users, X } from "lucide-react";
-import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 
 const adminNav = [
-  { label: "Tong quan", href: "/admin", icon: BarChart3 },
-  { label: "San pham", href: "/admin/products", icon: Package },
-  { label: "Don hang", href: "/admin/orders", icon: ShoppingCart },
-  { label: "Khach hang", href: "/admin/customers", icon: Users },
-  { label: "Danh muc", href: "/admin/categories", icon: FolderTree }
+  { label: "Tổng quan", href: "/admin", icon: BarChart3 },
+  { label: "Sản phẩm", href: "/admin/products", icon: Package },
+  { label: "Đơn hàng", href: "/admin/orders", icon: ShoppingCart },
+  { label: "Khách hàng", href: "/admin/customers", icon: Users },
+  { label: "Danh mục", href: "/admin/categories", icon: FolderTree }
 ];
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const [adminUser, setAdminUser] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function verifyAdmin() {
+      if (!token) {
+        setIsChecking(false);
+        setAdminUser(null);
+        return;
+      }
+
+      try {
+        const user = await authService.getCurrentUser();
+
+        if (ignore) return;
+
+        if (Number(user.role) === 1) {
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          setAdminUser(user);
+        } else {
+          setAdminUser(null);
+        }
+      } catch {
+        if (!ignore) setAdminUser(null);
+      } finally {
+        if (!ignore) setIsChecking(false);
+      }
+    }
+
+    verifyAdmin();
+
+    return () => {
+      ignore = true;
+    };
+  }, [token]);
+
+  if (isChecking) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#f7fbfb] text-sm font-bold text-cocoa">
+        Đang kiểm tra quyền quản trị...
+      </div>
+    );
+  }
+
+  if (!token || Number(adminUser?.role) !== 1) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location.pathname, message: "Vui lòng đăng nhập bằng tài khoản quản trị." }}
+      />
+    );
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("currentUser");
+      window.dispatchEvent(new Event("authChanged"));
+      navigate("/login", { replace: true });
+    }
+  };
 
   const navClass = ({ isActive }) =>
     `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
@@ -32,7 +102,7 @@ export default function AdminLayout() {
             </span>
             <div>
               <p className="text-lg font-black">KidStore</p>
-              <p className="text-xs font-semibold text-cocoa/50">Staff Panel</p>
+              <p className="text-xs font-semibold text-cocoa/50">Bảng quản trị</p>
             </div>
           </Link>
           <button className="rounded-full p-2 text-cocoa lg:hidden" type="button" onClick={() => setOpen(false)}>
@@ -55,12 +125,16 @@ export default function AdminLayout() {
         <div className="absolute bottom-5 left-5 right-5 grid gap-2">
           <Link to="/" className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-cocoa/70 hover:bg-cream">
             <Home size={18} />
-            Ve website
+            Về website
           </Link>
-          <Link to="/login" className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-cocoa/70 hover:bg-cream">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-bold text-cocoa/70 hover:bg-cream"
+          >
             <LogOut size={18} />
-            Dang xuat
-          </Link>
+            Đăng xuất
+          </button>
         </div>
       </aside>
 
@@ -73,12 +147,12 @@ export default function AdminLayout() {
               <Menu size={20} />
             </button>
             <div className="hidden lg:block">
-              <p className="text-sm font-semibold text-cocoa/55">Quan ly nhan vien</p>
-              <h1 className="text-xl font-black text-cocoa">KidStore Admin</h1>
+              <p className="text-sm font-semibold text-cocoa/55">Quản lý cửa hàng</p>
+              <h1 className="text-xl font-black text-cocoa">Quản trị KidStore</h1>
             </div>
             <div className="flex items-center gap-3 rounded-full bg-cream px-4 py-2">
               <Boxes size={18} className="text-berry" />
-              <span className="text-sm font-bold">Staff Demo</span>
+              <span className="text-sm font-bold">Quản trị viên</span>
             </div>
           </div>
         </header>
@@ -88,4 +162,12 @@ export default function AdminLayout() {
       </div>
     </div>
   );
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("currentUser") || "null");
+  } catch {
+    return null;
+  }
 }

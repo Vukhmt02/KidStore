@@ -1,27 +1,56 @@
 import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import EmptyState from "../components/EmptyState";
+import Loading from "../components/Loading";
 import ProductCard from "../components/ProductCard";
-import { getProductById, products } from "../data/products";
+import { useCatalog } from "../hooks/useCatalog";
 import { useCart } from "../hooks/useCart";
 import { formatCurrency } from "../utils/formatCurrency";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = getProductById(id);
+  const { products, isLoading } = useCatalog();
+  const product = products.find((item) => item.id === Number(id));
   const { addToCart } = useCart();
   const [imageIndex, setImageIndex] = useState(0);
   const [size, setSize] = useState(product?.sizes[0] || "");
   const [color, setColor] = useState(product?.colors[0] || "");
   const [quantity, setQuantity] = useState(1);
+  const [cartError, setCartError] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+
+  useEffect(() => {
+    setImageIndex(0);
+    setSize(product?.sizes[0] || "");
+    setColor(product?.colors[0] || "");
+  }, [product]);
 
   const relatedProducts = useMemo(
     () => products.filter((item) => item.category === product?.category && item.id !== product?.id).slice(0, 4),
     [product]
   );
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAdding(true);
+      setCartError("");
+      await addToCart(product, { size, color, quantity });
+    } catch (error) {
+      if (error.message === "LOGIN_REQUIRED" || error.status === 401) {
+        navigate("/login", { state: { message: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng." } });
+        return;
+      }
+
+      setCartError(error.message || "Không thể thêm sản phẩm vào giỏ hàng.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  if (isLoading) return <Loading />;
 
   if (!product) {
     return (
@@ -114,11 +143,12 @@ export default function ProductDetail() {
                 <Plus size={16} />
               </button>
             </div>
-            <Button size="lg" onClick={() => addToCart(product, { size, color, quantity })}>
+            <Button size="lg" onClick={handleAddToCart} disabled={isAdding}>
               <ShoppingBag size={18} />
-              Thêm vào giỏ
+              {isAdding ? "Đang thêm..." : "Thêm vào giỏ"}
             </Button>
           </div>
+          {cartError && <p className="mt-3 text-sm font-semibold text-berry">{cartError}</p>}
         </div>
       </div>
 

@@ -19,11 +19,11 @@ export default function Register() {
     const password = form.get("password");
     const nextErrors = {};
 
-    if (!name) nextErrors.name = "Vui long nhap ho ten";
-    if (!email || !email.includes("@")) nextErrors.email = "Email chua hop le";
-    if (!phone || phone.trim().length < 9) nextErrors.phone = "So dien thoai chua hop le";
-    if (!address) nextErrors.address = "Vui long nhap dia chi";
-    if (!password || password.length < 6) nextErrors.password = "Mat khau toi thieu 6 ky tu";
+    if (!name) nextErrors.name = "Vui lòng nhập họ tên";
+    if (!email || !email.includes("@")) nextErrors.email = "Email chưa hợp lệ";
+    if (!phone || phone.trim().length < 9) nextErrors.phone = "Số điện thoại chưa hợp lệ";
+    if (!address) nextErrors.address = "Vui lòng nhập địa chỉ";
+    if (!password || password.length < 6) nextErrors.password = "Mật khẩu tối thiểu 6 ký tự";
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -35,20 +35,21 @@ export default function Register() {
         fullName: name,
         email,
         phone,
+        phoneNumber: phone,
         address,
         password
       });
 
       navigate("/login", {
         state: {
-          message: "Dang ky thanh cong. Hay dang nhap de tiep tuc."
+          message: "Đăng ký thành công. Hãy đăng nhập để tiếp tục."
         }
       });
     } catch (error) {
       const message =
         error.status === 400 || error.status === 409
-          ? error.message || "Email da ton tai hoac thong tin chua hop le"
-          : "Khong the dang ky luc nay. Vui long thu lai sau.";
+          ? error.message || "Email đã tồn tại hoặc thông tin chưa hợp lệ"
+          : "Không thể đăng ký lúc này. Vui lòng thử lại sau.";
 
       setErrors({
         form: message
@@ -61,27 +62,27 @@ export default function Register() {
   return (
     <section className="container-page grid min-h-[calc(100vh-20rem)] place-items-center py-12">
       <div className="w-full max-w-md rounded-[2rem] border border-cocoa/10 bg-white p-6 shadow-soft sm:p-8">
-        <h1 className="text-3xl font-black text-cocoa">Tao tai khoan</h1>
-        <p className="mt-2 text-sm text-cocoa/70">Dang ky de luu thong tin mua hang nhanh hon.</p>
+        <h1 className="text-3xl font-black text-cocoa">Tạo tài khoản</h1>
+        <p className="mt-2 text-sm text-cocoa/70">Đăng ký để lưu thông tin mua hàng nhanh hơn.</p>
 
         <form className="mt-7 grid gap-4" onSubmit={handleSubmit}>
-          <Input label="Ho ten" name="name" placeholder="Nguyen Minh An" error={errors.name} />
+          <Input label="Họ tên" name="name" placeholder="Nguyen Minh An" error={errors.name} />
           <Input label="Email" name="email" type="email" placeholder="you@example.com" error={errors.email} />
-          <Input label="So dien thoai" name="phone" type="tel" placeholder="0909 123 456" error={errors.phone} />
-          <Input label="Dia chi" name="address" placeholder="24 Pastel Street, TP.HCM" error={errors.address} />
-          <Input label="Mat khau" name="password" type="password" placeholder="********" error={errors.password} />
+          <Input label="Số điện thoại" name="phone" type="tel" placeholder="0909 123 456" error={errors.phone} />
+          <Input label="Địa chỉ" name="address" placeholder="24 Pastel Street, TP.HCM" error={errors.address} />
+          <Input label="Mật khẩu" name="password" type="password" placeholder="********" error={errors.password} />
           
           {errors.form && <p className="rounded-2xl bg-berry/10 px-4 py-3 text-sm font-semibold text-berry">{errors.form}</p>}
 
           <Button type="submit" size="lg" className="mt-2 w-full" disabled={loading}>
-            {loading ? "Dang tao tai khoan..." : "Dang ky"}
+            {loading ? "Đang tạo tài khoản..." : "Đăng ký"}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-cocoa/70">
-          Da co tai khoan?{" "}
+          Đã có tài khoản?{" "}
           <Link to="/login" className="font-bold text-berry hover:text-cocoa">
-            Dang nhap
+            Đăng nhập
           </Link>
         </p>
       </div>

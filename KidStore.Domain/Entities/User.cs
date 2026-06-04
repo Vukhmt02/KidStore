@@ -14,12 +14,14 @@ namespace KidStore.Domain.Entities
         public string PasswordHash { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
-        public int Role { get; set; } // 0=Customer, 1=Staff, 2=Admin
+        public int Role { get; set; } // 0=Customer, 1=Admin
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
 
         // Navigation
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public Cart? Cart { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

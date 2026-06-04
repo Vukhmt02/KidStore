@@ -66,7 +66,7 @@ public class AdminProductsController : ControllerBase
 
         return Ok(new
         {
-            message = "Xoa san pham thanh cong"
+            message = "Xóa sản phẩm thành công"
         });
     }
 }

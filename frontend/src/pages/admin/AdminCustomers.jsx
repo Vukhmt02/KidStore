@@ -16,12 +16,12 @@ export default function AdminCustomers() {
     <div className="grid gap-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quan ly khach hang</h2>
-          <p className="mt-2 text-sm text-cocoa/60">Theo doi thong tin khach hang va lich su mua hang.</p>
+          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quản lý khách hàng</h2>
+          <p className="mt-2 text-sm text-cocoa/60">Theo dõi thông tin khách hàng và lịch sử mua hàng.</p>
         </div>
         <Button>
           <UserPlus size={18} />
-          Them khach
+          Thêm khách
         </Button>
       </div>
 
@@ -31,7 +31,7 @@ export default function AdminCustomers() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Tim khach hang..."
+            placeholder="Tìm khách hàng..."
             className="w-full rounded-2xl border border-cocoa/10 bg-cream py-3 pl-11 pr-4 text-sm outline-none focus:border-berry focus:bg-white"
           />
         </label>
@@ -50,11 +50,11 @@ export default function AdminCustomers() {
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-2xl bg-white p-3">
-                  <p className="text-cocoa/50">Don hang</p>
+                  <p className="text-cocoa/50">Đơn hàng</p>
                   <p className="mt-1 font-black text-cocoa">{customer.orders}</p>
                 </div>
                 <div className="rounded-2xl bg-white p-3">
-                  <p className="text-cocoa/50">Da chi</p>
+                  <p className="text-cocoa/50">Đã chi</p>
                   <p className="mt-1 font-black text-berry">{formatCurrency(customer.spent)}</p>
                 </div>
               </div>

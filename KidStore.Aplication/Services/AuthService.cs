@@ -8,6 +8,8 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using KidStore.Domain.Exceptions;
 
 namespace KidStore.Application.Services;
 
@@ -15,10 +17,7 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
-    //public AuthService(IUserRepository userRepository)
-    //{
-    //    _userRepository = userRepository;
-    //}
+
     public AuthService(
     IUserRepository userRepository,
     IConfiguration configuration)
@@ -29,17 +28,20 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto, string? ipAddress = null)
     {
-        var exists = await _userRepository.ExistsByEmailAsync(dto.Email);
+        ValidateRegistration(dto);
+
+        var email = dto.Email.Trim().ToLowerInvariant();
+        var exists = await _userRepository.ExistsByEmailAsync(email);
 
         if (exists)
         {
-            throw new Exception("Email already exists");
+            throw new ConflictException("Email đã tồn tại.");
         }
 
         var user = new User
         {
-            FullName = dto.FullName,
-            Email = dto.Email,
+            FullName = dto.FullName.Trim(),
+            Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             PhoneNumber = dto.PhoneNumber,
             Address = dto.Address,
@@ -49,11 +51,9 @@ public class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
 
-        return new AuthResponseDto
-        {
-            AccessToken = "demo-token"
-        };
+        return await CreateAuthResponseAsync(user, ipAddress);
     }
+
     private string GenerateJwtToken(User user)
     {
         var claims = new[]
@@ -63,9 +63,11 @@ public class AuthService : IAuthService
         new Claim(ClaimTypes.Role, user.Role.ToString())
     };
 
+        var jwtKey = _configuration["Jwt:Key"]
+            ?? throw new InvalidOperationException("Jwt:Key chưa được cấu hình.");
+
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"]));
+            Encoding.UTF8.GetBytes(jwtKey));
 
         var creds = new SigningCredentials(
             key,
@@ -80,18 +82,14 @@ public class AuthService : IAuthService
             .WriteToken(token);
     }
 
-
-
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto, string? ipAddress = null)
     {
-
-        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        var user = await _userRepository.GetByEmailAsync(dto.Email.Trim().ToLowerInvariant());
         if (user == null)
         {
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Email hoặc mật khẩu không đúng.");
         }
 
-        // Kiểm tra password
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(
             dto.Password,
             user.PasswordHash
@@ -99,46 +97,155 @@ public class AuthService : IAuthService
 
         if (!isPasswordValid)
         {
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Email hoặc mật khẩu không đúng.");
         }
 
-        return new AuthResponseDto
+        if (!user.IsActive)
         {
-            AccessToken = GenerateJwtToken(user),
-            RefreshToken = "refresh-token",
-            ExpiresIn = 3600,
+            throw new ForbiddenException("Tài khoản đã bị khóa.");
+        }
 
-            User = new UserInfoDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Role = user.Role
-            }
-        };
+        user.LastLoginAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+
+        return await CreateAuthResponseAsync(user, ipAddress);
     }
 
     public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken, string? ipAddress = null)
     {
+        var storedToken = await _userRepository.GetActiveRefreshTokenByHashAsync(HashToken(refreshToken));
+
+        if (storedToken == null || !storedToken.IsActive)
+        {
+            throw new UnauthorizedException("Refresh token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (!storedToken.User.IsActive)
+        {
+            throw new ForbiddenException("Tài khoản đã bị khóa.");
+        }
+
+        await _userRepository.RevokeRefreshTokenAsync(storedToken, ipAddress);
+
+        return await CreateAuthResponseAsync(storedToken.User, ipAddress);
+    }
+
+    public async Task LogoutAsync(string refreshToken, string? ipAddress = null)
+    {
+        var storedToken = await _userRepository.GetActiveRefreshTokenByHashAsync(HashToken(refreshToken));
+
+        if (storedToken != null)
+        {
+            await _userRepository.RevokeRefreshTokenAsync(storedToken, ipAddress);
+        }
+    }
+
+    public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+    {
+        ValidateNewPassword(dto);
+
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new NotFoundException("Người dùng", userId);
+
+        if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+        {
+            throw new UnauthorizedException("Mật khẩu hiện tại không đúng.");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.RevokeAllRefreshTokensAsync(userId);
+    }
+
+    public async Task<UserInfoDto> GetMeAsync(int userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new NotFoundException("Người dùng", userId);
+
+        return MapUser(user);
+    }
+
+    public async Task<UserInfoDto> UpdateProfileAsync(int userId, UpdateProfileDto dto)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new NotFoundException("Người dùng", userId);
+
+        user.PhoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim();
+        user.Address = string.IsNullOrWhiteSpace(dto.Address) ? null : dto.Address.Trim();
+
+        await _userRepository.UpdateAsync(user);
+
+        return MapUser(user);
+    }
+
+    private async Task<AuthResponseDto> CreateAuthResponseAsync(User user, string? ipAddress)
+    {
+        var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+        await _userRepository.AddRefreshTokenAsync(new RefreshToken
+        {
+            UserId = user.Id,
+            TokenHash = HashToken(refreshToken),
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedByIp = ipAddress
+        });
+
         return new AuthResponseDto
         {
-            AccessToken = "refreshed-access-token",
-            RefreshToken = "refreshed-refresh-token"
+            AccessToken = GenerateJwtToken(user),
+            RefreshToken = refreshToken,
+            ExpiresIn = 3600,
+            User = MapUser(user)
         };
     }
 
-    public Task LogoutAsync(string refreshToken, string? ipAddress = null)
+    private static string HashToken(string token)
     {
-        throw new NotImplementedException();
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
     }
 
-    public Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+    private static void ValidateRegistration(RegisterDto dto)
     {
-        throw new NotImplementedException();
+        var errors = new Dictionary<string, string[]>();
+
+        if (string.IsNullOrWhiteSpace(dto.FullName))
+            errors["fullName"] = new[] { "Họ tên không được để trống." };
+
+        if (string.IsNullOrWhiteSpace(dto.Email) || !dto.Email.Contains('@'))
+            errors["email"] = new[] { "Email không hợp lệ." };
+
+        if (string.IsNullOrWhiteSpace(dto.Password) || dto.Password.Length < 6)
+            errors["password"] = new[] { "Mật khẩu phải có ít nhất 6 ký tự." };
+
+        if (errors.Count > 0)
+            throw new ApplicationValidationException(errors);
     }
 
-    public Task<UserInfoDto> GetMeAsync(int userId)
+    private static void ValidateNewPassword(ChangePasswordDto dto)
     {
-        throw new NotImplementedException();
+        var errors = new Dictionary<string, string[]>();
+
+        if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+            errors["newPassword"] = new[] { "Mật khẩu mới phải có ít nhất 6 ký tự." };
+
+        if (dto.NewPassword != dto.ConfirmNewPassword)
+            errors["confirmNewPassword"] = new[] { "Mật khẩu xác nhận không khớp." };
+
+        if (errors.Count > 0)
+            throw new ApplicationValidationException(errors);
+    }
+
+    private static UserInfoDto MapUser(User user)
+    {
+        return new UserInfoDto
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Address = user.Address,
+            Role = user.Role,
+            RoleName = user.Role == 1 ? "Admin" : "Customer"
+        };
     }
 }

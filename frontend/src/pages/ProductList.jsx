@@ -2,10 +2,12 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import EmptyState from "../components/EmptyState";
+import Loading from "../components/Loading";
 import ProductCard from "../components/ProductCard";
-import { categories, products } from "../data/products";
+import { useCatalog } from "../hooks/useCatalog";
 
 export default function ProductList() {
+  const { categories, products, isLoading, error } = useCatalog();
   const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
@@ -29,12 +31,16 @@ export default function ProductList() {
     }
   };
 
+  if (isLoading) return <Loading />;
+
   return (
     <section className="container-page py-10">
       <div className="mb-8">
         <h1 className="section-title">Tất cả sản phẩm</h1>
         <p className="section-subtitle">Tìm đồ mặc hằng ngày, đồ đi chơi và phụ kiện mềm mại cho bé.</p>
       </div>
+
+      {error && <p className="mb-6 text-sm font-semibold text-berry">{error}</p>}
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="h-fit rounded-[1.75rem] border border-cocoa/10 bg-white p-5 shadow-sm">

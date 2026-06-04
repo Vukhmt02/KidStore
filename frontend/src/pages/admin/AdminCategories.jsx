@@ -30,7 +30,7 @@ export default function AdminCategories() {
 
         const normalizedCategories = normalizeList(categoryData).map((category, index) => ({
           id: category.id ?? category.categoryId,
-          name: category.name ?? category.categoryName ?? `Danh muc ${index + 1}`,
+          name: category.name ?? category.categoryName ?? `Danh mục ${index + 1}`,
           image:
             category.image ||
             category.imageUrl ||
@@ -49,7 +49,7 @@ export default function AdminCategories() {
         setLoadError("");
       } catch (error) {
         if (!ignore) {
-          setLoadError(error.message || "Khong the tai danh muc tu backend");
+          setLoadError(error.message || "Không thể tải danh mục từ máy chủ");
           setCategories(initialCategories);
         }
       } finally {
@@ -65,14 +65,14 @@ export default function AdminCategories() {
   }, []);
 
   const handleDelete = async (categoryId) => {
-    if (!window.confirm("Xoa danh muc nay?")) return;
+    if (!window.confirm("Xóa danh mục này?")) return;
 
     try {
       setActionError("");
       await catalogService.deleteCategory(categoryId);
       setCategories((currentCategories) => currentCategories.filter((category) => category.id !== categoryId));
     } catch (error) {
-      setActionError(error.message || "Khong the xoa danh muc");
+      setActionError(error.message || "Không thể xóa danh mục");
     }
   };
 
@@ -80,18 +80,18 @@ export default function AdminCategories() {
     <div className="grid gap-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quan ly danh muc</h2>
-          <p className="mt-2 text-sm text-cocoa/60">Sap xep danh muc hien thi tren website KidStore.</p>
+          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quản lý danh mục</h2>
+          <p className="mt-2 text-sm text-cocoa/60">Sắp xếp danh mục hiển thị trên website KidStore.</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus size={18} />
-          Them danh muc
+          Thêm danh mục
         </Button>
       </div>
 
       {loadError && (
         <p className="rounded-2xl bg-berry/10 px-4 py-3 text-sm font-semibold text-berry">
-          {loadError}. Dang hien du lieu mau.
+          {loadError}. Đang hiển thị dữ liệu mẫu.
         </p>
       )}
 
@@ -135,7 +135,7 @@ export default function AdminCategories() {
         })}
       </div>
 
-      {isLoading && <p className="text-sm font-semibold text-cocoa/55">Dang tai danh muc tu backend...</p>}
+      {isLoading && <p className="text-sm font-semibold text-cocoa/55">Đang tải danh mục từ máy chủ...</p>}
 
       {showCreateModal && (
         <CreateCategoryModal
@@ -186,7 +186,7 @@ function CreateCategoryModal({ nextColor, onClose, onCreate }) {
     setApiError("");
 
     if (!name) {
-      setError("Vui long nhap ten danh muc");
+      setError("Vui lòng nhập tên danh mục");
       return;
     }
 
@@ -205,7 +205,7 @@ function CreateCategoryModal({ nextColor, onClose, onCreate }) {
         color: nextColor
       });
     } catch (error) {
-      setApiError(error.message || "Khong the them danh muc");
+      setApiError(error.message || "Không thể thêm danh mục");
     } finally {
       setIsSubmitting(false);
     }
@@ -216,7 +216,7 @@ function CreateCategoryModal({ nextColor, onClose, onCreate }) {
       <div className="w-full max-w-lg rounded-[1.75rem] bg-white p-5 shadow-soft sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-black text-cocoa">Them danh muc</h3>
+            <h3 className="text-xl font-black text-cocoa">Thêm danh mục</h3>
             <p className="mt-1 text-sm text-cocoa/60">Payload gui API: name.</p>
           </div>
           <button className="rounded-full bg-cream p-2 text-cocoa hover:text-berry" type="button" onClick={onClose} aria-label="Dong">
@@ -226,7 +226,7 @@ function CreateCategoryModal({ nextColor, onClose, onCreate }) {
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-bold text-cocoa">Ten danh muc</span>
+            <span className="mb-2 block text-sm font-bold text-cocoa">Tên danh mục</span>
             <input
               name="name"
               className="w-full rounded-2xl border border-cocoa/10 bg-cream px-4 py-3 text-sm outline-none focus:border-berry focus:bg-white"
@@ -239,10 +239,10 @@ function CreateCategoryModal({ nextColor, onClose, onCreate }) {
 
           <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Button variant="secondary" type="button" onClick={onClose}>
-              Huy
+              Hủy
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Dang luu..." : "Luu danh muc"}
+              {isSubmitting ? "Đang lưu..." : "Lưu danh mục"}
             </Button>
           </div>
         </form>
@@ -265,7 +265,7 @@ function EditCategoryModal({ category, onClose, onUpdate }) {
     setApiError("");
 
     if (!name) {
-      setError("Vui long nhap ten danh muc");
+      setError("Vui lòng nhập tên danh mục");
       return;
     }
 
@@ -274,7 +274,7 @@ function EditCategoryModal({ category, onClose, onUpdate }) {
       await catalogService.updateCategory(category.id, { name, isActive: true });
       onUpdate({ ...category, name });
     } catch (error) {
-      setApiError(error.message || "Khong the cap nhat danh muc");
+      setApiError(error.message || "Không thể cập nhật danh mục");
     } finally {
       setIsSubmitting(false);
     }
@@ -285,8 +285,8 @@ function EditCategoryModal({ category, onClose, onUpdate }) {
       <div className="w-full max-w-lg rounded-[1.75rem] bg-white p-5 shadow-soft sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-black text-cocoa">Sua danh muc</h3>
-            <p className="mt-1 text-sm text-cocoa/60">Cap nhat ten danh muc trong backend.</p>
+            <h3 className="text-xl font-black text-cocoa">Sửa danh mục</h3>
+            <p className="mt-1 text-sm text-cocoa/60">Cập nhật tên danh mục trên máy chủ.</p>
           </div>
           <button className="rounded-full bg-cream p-2 text-cocoa hover:text-berry" type="button" onClick={onClose} aria-label="Dong">
             <X size={20} />
@@ -295,7 +295,7 @@ function EditCategoryModal({ category, onClose, onUpdate }) {
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-bold text-cocoa">Ten danh muc</span>
+            <span className="mb-2 block text-sm font-bold text-cocoa">Tên danh mục</span>
             <input
               name="name"
               defaultValue={category.name}
@@ -308,10 +308,10 @@ function EditCategoryModal({ category, onClose, onUpdate }) {
 
           <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Button variant="secondary" type="button" onClick={onClose}>
-              Huy
+              Hủy
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Dang luu..." : "Luu thay doi"}
+              {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
             </Button>
           </div>
         </form>

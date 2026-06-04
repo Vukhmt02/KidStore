@@ -12,12 +12,12 @@ const fallbackSizeOptions = [
 ];
 
 const fallbackColorOptions = [
-  { id: 1, label: "Trang", swatch: "bg-white" },
-  { id: 2, label: "Den", swatch: "bg-[#222222]" },
-  { id: 3, label: "Do", swatch: "bg-[#ef4444]" },
+  { id: 1, label: "Trắng", swatch: "bg-white" },
+  { id: 2, label: "Đen", swatch: "bg-[#222222]" },
+  { id: 3, label: "Đỏ", swatch: "bg-[#ef4444]" },
   { id: 4, label: "Xanh", swatch: "bg-[#3b82f6]" },
-  { id: 5, label: "Vang", swatch: "bg-[#facc15]" },
-  { id: 6, label: "Hong", swatch: "bg-[#f9a8d4]" }
+  { id: 5, label: "Vàng", swatch: "bg-[#facc15]" },
+  { id: 6, label: "Hồng", swatch: "bg-[#f9a8d4]" }
 ];
 
 const emptyImage = { imageUrl: "", isMain: true, sortOrder: 0 };
@@ -55,7 +55,7 @@ export default function AdminProducts() {
         const normalizedCategories = normalizeCategories(categoryResult.value);
         setCategories(normalizedCategories);
       } else {
-        errors.push("danh muc");
+        errors.push("danh mục");
         setCategories(initialCategories);
       }
 
@@ -63,7 +63,7 @@ export default function AdminProducts() {
         const normalizedProducts = normalizeProducts(productResult.value);
         setProducts(normalizedProducts);
       } else {
-        errors.push("san pham");
+        errors.push("sản phẩm");
         setProducts(initialProducts);
       }
 
@@ -81,7 +81,7 @@ export default function AdminProducts() {
         setColorOptions(fallbackColorOptions);
       }
 
-      setLoadError(errors.length ? `Khong the tai ${errors.join(", ")} tu backend` : "");
+      setLoadError(errors.length ? `Không thể tải ${errors.join(", ")} từ máy chủ` : "");
       setIsLoading(false);
     }
 
@@ -101,14 +101,14 @@ export default function AdminProducts() {
   );
 
   const handleDelete = async (productId) => {
-    if (!window.confirm("Xoa san pham nay?")) return;
+    if (!window.confirm("Xóa sản phẩm này?")) return;
 
     try {
       setActionError("");
       await catalogService.deleteProduct(productId);
       setProducts((currentProducts) => currentProducts.filter((product) => product.id !== productId));
     } catch (error) {
-      setActionError(error.message || "Khong the xoa san pham");
+      setActionError(error.message || "Không thể xóa sản phẩm");
     }
   };
 
@@ -116,18 +116,18 @@ export default function AdminProducts() {
     <div className="grid gap-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quan ly san pham</h2>
-          <p className="mt-2 text-sm text-cocoa/60">Them, sua, an hien va theo doi san pham KidStore.</p>
+          <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quản lý sản phẩm</h2>
+          <p className="mt-2 text-sm text-cocoa/60">Them, sua, an hien va theo doi sản phẩm KidStore.</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus size={18} />
-          Them san pham
+          Thêm sản phẩm
         </Button>
       </div>
 
       {loadError && (
         <p className="rounded-2xl bg-berry/10 px-4 py-3 text-sm font-semibold text-berry">
-          {loadError}. Dang hien du lieu mau.
+          {loadError}. Đang hiển thị dữ liệu mẫu.
         </p>
       )}
 
@@ -140,7 +140,7 @@ export default function AdminProducts() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tim san pham..."
+              placeholder="Tìm sản phẩm..."
               className="w-full rounded-2xl border border-cocoa/10 bg-cream py-3 pl-11 pr-4 text-sm outline-none focus:border-berry focus:bg-white"
             />
           </label>
@@ -149,7 +149,7 @@ export default function AdminProducts() {
             onChange={(event) => setCategory(event.target.value)}
             className="rounded-2xl border border-cocoa/10 bg-cream px-4 py-3 text-sm font-semibold outline-none focus:border-berry focus:bg-white"
           >
-            <option value="all">Tat ca danh muc</option>
+            <option value="all">Tất cả danh mục</option>
             {categories.map((item) => (
               <option key={item.id} value={String(item.id)}>
                 {item.name}
@@ -162,11 +162,11 @@ export default function AdminProducts() {
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="text-xs uppercase text-cocoa/45">
               <tr>
-                <th className="py-3">San pham</th>
-                <th>Danh muc</th>
+                <th className="py-3">Sản phẩm</th>
+                <th>Danh mục</th>
                 <th>Gia</th>
-                <th>Ton kho</th>
-                <th>Trang thai</th>
+                <th>Tồn kho</th>
+                <th>Trạng thái</th>
                 <th className="text-right">Thao tac</th>
               </tr>
             </thead>
@@ -186,7 +186,7 @@ export default function AdminProducts() {
                   <td className="font-bold text-berry">{formatCurrency(product.price)}</td>
                   <td>{product.stockQuantity ?? product.variants?.reduce((total, item) => total + Number(item.stockQuantity || 0), 0) ?? "-"}</td>
                   <td>
-                    <span className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-cocoa">Dang ban</span>
+                    <span className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-cocoa">Đang bán</span>
                   </td>
                   <td>
                     <div className="flex justify-end gap-2">
@@ -213,7 +213,7 @@ export default function AdminProducts() {
             </tbody>
           </table>
         </div>
-        {isLoading && <p className="mt-4 text-sm font-semibold text-cocoa/55">Dang tai san pham tu backend...</p>}
+        {isLoading && <p className="mt-4 text-sm font-semibold text-cocoa/55">Đang tải sản phẩm từ máy chủ...</p>}
       </div>
 
       {showCreateModal && (
@@ -250,6 +250,11 @@ export default function AdminProducts() {
 
 function CreateProductModal({ categories, colorOptions, onClose, onCreate, product, sizeOptions }) {
   const isEditing = Boolean(product);
+  const persistedCategories = categories.filter((category) => Number(category.id) > 0);
+  const defaultCategoryId =
+    persistedCategories.find((category) => Number(category.id) === Number(product?.categoryId))?.id ??
+    persistedCategories[0]?.id ??
+    "";
   const [variants, setVariants] = useState(
     product?.variants?.length ? product.variants.map(normalizeVariantForForm) : [createEmptyVariant(sizeOptions, colorOptions)]
   );
@@ -300,20 +305,24 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
     };
     const nextErrors = {};
 
-    if (!payload.categoryId || payload.categoryId <= 0) nextErrors.categoryId = "Vui long nhap categoryId";
-    if (!payload.name) nextErrors.name = "Vui long nhap ten san pham";
-    if (!payload.description) nextErrors.description = "Vui long nhap mo ta";
-    if (!payload.price || payload.price <= 0) nextErrors.price = "Gia san pham chua hop le";
-    if (payload.discountPrice < 0) nextErrors.discountPrice = "Gia giam khong hop le";
-    if (!payload.variants.length) nextErrors.variants = "Nhap it nhat 1 bien the";
+    if (!payload.categoryId || payload.categoryId <= 0) {
+      nextErrors.categoryId = persistedCategories.length
+        ? "Vui lòng chọn danh mục"
+        : "Không tải được danh mục từ cơ sở dữ liệu. Hãy đăng nhập tài khoản quản trị và kiểm tra máy chủ.";
+    }
+    if (!payload.name) nextErrors.name = "Vui lòng nhập tên sản phẩm";
+    if (!payload.description) nextErrors.description = "Vui lòng nhập mô tả";
+    if (!payload.price || payload.price <= 0) nextErrors.price = "Giá sản phẩm chưa hợp lệ";
+    if (payload.discountPrice < 0) nextErrors.discountPrice = "Giá giảm không hợp lệ";
+    if (!payload.variants.length) nextErrors.variants = "Nhập ít nhất 1 biến thể";
     if (payload.variants.some((variant) => variant.sizeId <= 0 || variant.colorId <= 0)) {
-      nextErrors.variants = "SizeId va colorId phai lon hon 0";
+      nextErrors.variants = "SizeId và colorId phải lớn hơn 0";
     }
     if (payload.variants.some((variant) => variant.extraPrice < 0 || variant.stockQuantity < 0)) {
-      nextErrors.variants = "Gia phu va ton kho khong duoc am";
+      nextErrors.variants = "Giá phụ và tồn kho không được âm";
     }
     if (!payload.images.length || payload.images.some((image) => !image.imageUrl)) {
-      nextErrors.images = "Nhap URL anh san pham";
+      nextErrors.images = "Nhập URL ảnh sản phẩm";
     }
 
     setErrors(nextErrors);
@@ -337,10 +346,10 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
         sizes: payload.variants.map((variant) => `Size ${variant.sizeId}`),
         colors: payload.variants.map((variant) => `Color ${variant.colorId}`),
         gallery: payload.images.map((image) => image.imageUrl),
-        badge: "Moi"
+        badge: "Mới"
       });
     } catch (error) {
-      setApiError(error.message || "Khong the them san pham");
+      setApiError(error.message || "Không thể thêm sản phẩm");
     } finally {
       setIsSubmitting(false);
     }
@@ -351,9 +360,9 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
       <div className="mx-auto w-full max-w-5xl rounded-[1.75rem] bg-white p-5 shadow-soft sm:p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-black text-cocoa">{isEditing ? "Sua san pham" : "Them san pham"}</h3>
+            <h3 className="text-xl font-black text-cocoa">{isEditing ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h3>
             <p className="mt-1 text-sm text-cocoa/60">
-              {isEditing ? "Cap nhat san pham trong backend." : "Nhap thong tin san pham, bien the size/mau va hinh anh."}
+              {isEditing ? "Cập nhật sản phẩm trên máy chủ." : "Nhập thông tin sản phẩm, biến thể kích thước/màu và hình ảnh."}
             </p>
           </div>
           <button className="rounded-full bg-cream p-2 text-cocoa hover:text-berry" type="button" onClick={onClose} aria-label="Dong">
@@ -363,45 +372,50 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
 
         <form className="mt-6 grid gap-5" onSubmit={handleSubmit}>
           <section className="rounded-3xl border border-cocoa/10 p-4">
-            <SectionTitle title="Thong tin co ban" description="Cac truong nay tuong ung voi categoryId, name, description, price va discountPrice." />
+            <SectionTitle title="Thông tin cơ bản" description="Các trường này tương ứng với categoryId, name, description, price và discountPrice." />
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <FormField label="Ma danh muc" hint="categoryId" error={errors.categoryId}>
-                <select name="categoryId" className={inputClassName} defaultValue={product?.categoryId ?? categories[0]?.id ?? ""}>
+              <FormField label="Mã danh mục" hint="categoryId" error={errors.categoryId}>
+                <select name="categoryId" className={inputClassName} defaultValue={defaultCategoryId}>
                   <option value="" disabled>
-                    Chon danh muc
+                    {persistedCategories.length ? "Chọn danh mục" : "Không có danh mục từ cơ sở dữ liệu"}
                   </option>
-                  {categories.map((item) => (
+                  {persistedCategories.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.name}
                     </option>
                   ))}
                 </select>
+                {!persistedCategories.length && (
+                  <span className="mt-2 block text-xs font-semibold text-berry">
+                    Không thể lưu sản phẩm bằng mã danh mục dữ liệu mẫu. Hãy đăng nhập tài khoản quản trị và tải lại trang.
+                  </span>
+                )}
               </FormField>
 
-              <FormField label="Ten san pham" hint="name" error={errors.name}>
+              <FormField label="Tên sản phẩm" hint="name" error={errors.name}>
                 <input name="name" defaultValue={product?.name ?? ""} className={inputClassName} placeholder="Ao thun pastel" />
               </FormField>
 
-              <FormField label="Gia ban" hint="price" error={errors.price}>
+              <FormField label="Giá bán" hint="price" error={errors.price}>
                 <input name="price" type="number" min="0" defaultValue={product?.price ?? ""} className={inputClassName} placeholder="199000" />
               </FormField>
 
-              <FormField label="Gia giam" hint="discountPrice" error={errors.discountPrice}>
+              <FormField label="Giá giảm" hint="discountPrice" error={errors.discountPrice}>
                 <input name="discountPrice" type="number" min="0" defaultValue={product?.discountPrice ?? 0} className={inputClassName} />
               </FormField>
 
-              <FormField label="Mo ta" hint="description" error={errors.description} className="sm:col-span-2">
-                <textarea name="description" rows="3" defaultValue={product?.description ?? ""} className={inputClassName} placeholder="Mo ta ngan ve san pham" />
+              <FormField label="Mô tả" hint="description" error={errors.description} className="sm:col-span-2">
+                <textarea name="description" rows="3" defaultValue={product?.description ?? ""} className={inputClassName} placeholder="Mô tả ngan ve sản phẩm" />
               </FormField>
             </div>
           </section>
 
           <section className="rounded-3xl border border-cocoa/10 p-4">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <SectionTitle title="Bien the san pham" description="Moi dong la mot ket hop size, mau, gia cong them va so luong ton kho." />
+              <SectionTitle title="Bien the sản phẩm" description="Mỗi dòng là một kết hợp kích thước, màu, giá cộng thêm và số lượng tồn kho." />
               <Button type="button" variant="secondary" size="sm" onClick={() => setVariants((current) => [...current, createEmptyVariant(sizeOptions, colorOptions)])}>
                 <Plus size={16} />
-                Them bien the
+                Thêm biến thể
               </Button>
             </div>
             <div className="mt-4 grid gap-3">
@@ -417,7 +431,7 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                     </select>
                   </MiniField>
 
-                  <MiniField label="Mau">
+                  <MiniField label="Màu">
                     <div className="relative">
                       <span className={`pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-cocoa/15 ${getColorOption(variant.colorId).swatch}`} />
                       <select value={variant.colorId} onChange={(event) => updateVariant(index, "colorId", event.target.value)} className={`${inputClassName} pl-10`}>
@@ -430,11 +444,11 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                     </div>
                   </MiniField>
 
-                  <MiniField label="Gia cong them">
+                  <MiniField label="Giá cộng thêm">
                     <input type="number" min="0" value={variant.extraPrice} onChange={(event) => updateVariant(index, "extraPrice", event.target.value)} className={inputClassName} placeholder="0" />
                   </MiniField>
 
-                  <MiniField label="Ton kho">
+                  <MiniField label="Tồn kho">
                     <input type="number" min="0" value={variant.stockQuantity} onChange={(event) => updateVariant(index, "stockQuantity", event.target.value)} className={inputClassName} placeholder="0" />
                   </MiniField>
 
@@ -443,7 +457,7 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                     className="mt-auto inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-3 text-sm font-bold text-cocoa hover:text-berry disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={variants.length === 1}
                     onClick={() => setVariants((current) => current.filter((_, itemIndex) => itemIndex !== index))}
-                    aria-label="Xoa bien the"
+                    aria-label="Xóa biến thể"
                   >
                     <Trash2 size={16} />
                     Xoa
@@ -452,17 +466,17 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
               ))}
             </div>
             <p className="mt-2 text-xs font-semibold text-cocoa/50">
-              He thong tu gui ma size va ma mau tuong ung trong co so du lieu.
+              Hệ thống tự gửi mã kích thước và mã màu tương ứng trong cơ sở dữ liệu.
             </p>
             {errors.variants && <span className="mt-2 block text-xs font-semibold text-berry">{errors.variants}</span>}
           </section>
 
           <section className="rounded-3xl border border-cocoa/10 p-4">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <SectionTitle title="Hinh anh san pham" description="Anh dau tien se duoc gui voi isMain = true." />
+              <SectionTitle title="Hình ảnh sản phẩm" description="Ảnh đầu tiên sẽ được gửi với isMain = true." />
               <Button type="button" variant="secondary" size="sm" onClick={() => setImages((current) => [...current, { ...emptyImage, isMain: false, sortOrder: current.length }])}>
                 <Plus size={16} />
-                Them anh
+                Thêm ảnh
               </Button>
             </div>
             <div className="mt-4 grid gap-3">
@@ -476,11 +490,11 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                     )}
                   </div>
 
-                  <MiniField label={index === 0 ? "URL anh chinh" : "URL anh phu"}>
+                  <MiniField label={index === 0 ? "URL ảnh chính" : "URL ảnh phụ"}>
                     <input value={image.imageUrl} onChange={(event) => updateImage(index, "imageUrl", event.target.value)} className={inputClassName} placeholder="https://..." />
                   </MiniField>
 
-                  <MiniField label="Thu tu">
+                  <MiniField label="Thứ tự">
                     <input type="number" min="0" value={image.sortOrder} onChange={(event) => updateImage(index, "sortOrder", Number(event.target.value))} className={inputClassName} placeholder="0" />
                   </MiniField>
 
@@ -489,7 +503,7 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                     className="mt-auto inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-3 text-sm font-bold text-cocoa hover:text-berry disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={images.length === 1}
                     onClick={() => setImages((current) => current.filter((_, itemIndex) => itemIndex !== index))}
-                    aria-label="Xoa anh"
+                    aria-label="Xóa ảnh"
                   >
                     <Trash2 size={16} />
                     Xoa
@@ -497,7 +511,7 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-xs font-semibold text-cocoa/50">Anh dau tien se duoc dat isMain = true.</p>
+            <p className="mt-2 text-xs font-semibold text-cocoa/50">Ảnh đầu tiên sẽ được đặt isMain = true.</p>
             {errors.images && <span className="mt-2 block text-xs font-semibold text-berry">{errors.images}</span>}
           </section>
 
@@ -505,10 +519,10 @@ function CreateProductModal({ categories, colorOptions, onClose, onCreate, produ
 
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Button variant="secondary" type="button" onClick={onClose}>
-              Huy
+              Hủy
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Dang luu..." : isEditing ? "Luu thay doi" : "Luu san pham"}
+              {isSubmitting ? "Đang lưu..." : isEditing ? "Lưu thay đổi" : "Lưu sản phẩm"}
             </Button>
           </div>
         </form>
@@ -571,7 +585,7 @@ function normalizeList(data) {
 function normalizeCategories(data) {
   return normalizeList(data).map((category, index) => ({
     id: category.id ?? category.categoryId,
-    name: category.name ?? category.categoryName ?? `Danh muc ${index + 1}`
+    name: category.name ?? category.categoryName ?? `Danh mục ${index + 1}`
   }));
 }
 
@@ -585,7 +599,7 @@ function normalizeSizes(data) {
 function normalizeColors(data) {
   return normalizeList(data).map((color, index) => ({
     id: color.id ?? color.colorId,
-    label: color.name ?? color.colorName ?? color.label ?? `Mau ${index + 1}`,
+    label: color.name ?? color.colorName ?? color.label ?? `Màu ${index + 1}`,
     swatch: getColorSwatch(color.name ?? color.colorName ?? color.label)
   }));
 }
@@ -598,7 +612,7 @@ function normalizeProducts(data) {
 
     return {
       id: product.id ?? product.productId,
-      name: product.name ?? product.productName ?? "San pham",
+      name: product.name ?? product.productName ?? "Sản phẩm",
       price: product.price ?? 0,
       discountPrice: product.discountPrice ?? 0,
       description: product.description ?? "",

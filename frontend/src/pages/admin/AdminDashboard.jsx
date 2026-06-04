@@ -5,18 +5,18 @@ import { products } from "../../data/products";
 import { formatCurrency } from "../../utils/formatCurrency";
 
 const stats = [
-  { label: "Doanh thu hom nay", value: formatCurrency(2849000), icon: TrendingUp, color: "bg-mint" },
-  { label: "Don moi", value: "12", icon: ClipboardList, color: "bg-peach" },
-  { label: "San pham", value: products.length, icon: Package, color: "bg-skysoft" },
-  { label: "Khach hang", value: "128", icon: Users, color: "bg-lemon" }
+  { label: "Doanh thu hôm nay", value: formatCurrency(2849000), icon: TrendingUp, color: "bg-mint" },
+  { label: "Đơn mới", value: "12", icon: ClipboardList, color: "bg-peach" },
+  { label: "Sản phẩm", value: products.length, icon: Package, color: "bg-skysoft" },
+  { label: "Khách hàng", value: "128", icon: Users, color: "bg-lemon" }
 ];
 
 export default function AdminDashboard() {
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Tong quan</h2>
-        <p className="mt-2 text-sm text-cocoa/60">Theo doi don hang, doanh thu va viec can lam trong ngay.</p>
+        <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Tổng quan</h2>
+        <p className="mt-2 text-sm text-cocoa/60">Theo dõi đơn hàng, doanh thu và việc cần làm trong ngày.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -37,19 +37,19 @@ export default function AdminDashboard() {
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <section className="rounded-[1.5rem] border border-cocoa/10 bg-white p-5 shadow-sm">
           <div className="mb-5 flex items-center justify-between">
-            <h3 className="text-lg font-black text-cocoa">Don hang gan day</h3>
+            <h3 className="text-lg font-black text-cocoa">Đơn hàng gần đây</h3>
             <Link to="/admin/orders" className="text-sm font-bold text-berry hover:text-cocoa">
-              Xem tat ca
+              Xem tất cả
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="text-xs uppercase text-cocoa/45">
                 <tr>
-                  <th className="py-3">Ma don</th>
-                  <th>Khach hang</th>
-                  <th>Ngay</th>
-                  <th>Trang thai</th>
+                  <th className="py-3">Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Ngày</th>
+                  <th>Trạng thái</th>
                   <th className="text-right">Tong</th>
                 </tr>
               </thead>
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
         </section>
 
         <section className="rounded-[1.5rem] border border-cocoa/10 bg-white p-5 shadow-sm">
-          <h3 className="text-lg font-black text-cocoa">Viec can lam</h3>
+          <h3 className="text-lg font-black text-cocoa">Việc cần làm</h3>
           <div className="mt-5 grid gap-3">
             {staffTasks.map((task) => (
               <label key={task} className="flex cursor-pointer items-center gap-3 rounded-2xl bg-cream p-4 text-sm font-bold text-cocoa">

@@ -28,7 +28,7 @@ function getErrorMessage(data) {
 
   if (typeof data === "string") {
     const isServerStackTrace = data.includes("System.") || data.includes("Microsoft.") || data.length > 180;
-    return isServerStackTrace ? "He thong dang gap loi. Vui long thu lai sau." : data;
+    return isServerStackTrace ? "Hệ thống đang gặp lỗi. Vui lòng thử lại sau." : data;
   }
 
   return data.message || data.title || data.error || "API request failed";
@@ -38,6 +38,7 @@ export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("accessToken");
 
   const response = await fetch(`${API_URL}${endpoint}`, {
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

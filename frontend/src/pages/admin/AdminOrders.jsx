@@ -3,16 +3,16 @@ import { useMemo, useState } from "react";
 import { orders } from "../../data/admin";
 import { formatCurrency } from "../../utils/formatCurrency";
 
-const statuses = ["Tat ca", "Cho xac nhan", "Dang giao", "Hoan thanh", "Da huy"];
+const statuses = ["Tất cả", "Chờ xác nhận", "Đang giao", "Hoàn thành", "Đã hủy"];
 
 export default function AdminOrders() {
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("Tat ca");
+  const [status, setStatus] = useState("Tất cả");
 
   const filteredOrders = useMemo(
     () =>
       orders
-        .filter((order) => status === "Tat ca" || order.status === status)
+        .filter((order) => status === "Tất cả" || order.status === status)
         .filter((order) => `${order.id} ${order.customer} ${order.phone}`.toLowerCase().includes(query.toLowerCase().trim())),
     [query, status]
   );
@@ -20,8 +20,8 @@ export default function AdminOrders() {
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quan ly don hang</h2>
-        <p className="mt-2 text-sm text-cocoa/60">Kiem tra, cap nhat trang thai va theo doi don hang.</p>
+        <h2 className="text-2xl font-black text-cocoa sm:text-3xl">Quản lý đơn hàng</h2>
+        <p className="mt-2 text-sm text-cocoa/60">Kiểm tra, cập nhật trạng thái và theo dõi đơn hàng.</p>
       </div>
 
       <div className="rounded-[1.5rem] border border-cocoa/10 bg-white p-4 shadow-sm">
@@ -31,7 +31,7 @@ export default function AdminOrders() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tim ma don, khach hang, so dien thoai..."
+              placeholder="Tìm mã đơn, khách hàng, số điện thoại..."
               className="w-full rounded-2xl border border-cocoa/10 bg-cream py-3 pl-11 pr-4 text-sm outline-none focus:border-berry focus:bg-white"
             />
           </label>
@@ -55,13 +55,13 @@ export default function AdminOrders() {
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="text-xs uppercase text-cocoa/45">
               <tr>
-                <th className="py-3">Ma don</th>
-                <th>Khach hang</th>
-                <th>So dien thoai</th>
-                <th>Ngay</th>
-                <th>Trang thai</th>
+                <th className="py-3">Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Ngày</th>
+                <th>Trạng thái</th>
                 <th className="text-right">Tong</th>
-                <th className="text-right">Chi tiet</th>
+                <th className="text-right">Chi tiết</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-cocoa/10">
@@ -76,7 +76,7 @@ export default function AdminOrders() {
                   </td>
                   <td className="text-right font-bold text-berry">{formatCurrency(order.total)}</td>
                   <td className="text-right">
-                    <button className="rounded-full bg-cream p-2 text-cocoa hover:text-berry" type="button" aria-label="Xem don hang">
+                    <button className="rounded-full bg-cream p-2 text-cocoa hover:text-berry" type="button" aria-label="Xem đơn hàng">
                       <Eye size={17} />
                     </button>
                   </td>

@@ -18,14 +18,37 @@ namespace KidStore.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<List<ProductResponseDTO>> GetAllAsync()
         {
-            return await _productRepository.GetAllAsync();
+            var products = await _productRepository.GetAllAsync();
+
+            return products.Select(MapProduct).ToList();
         }
 
-        public async Task<Product?> GetByIdAsync(int id)
+        public async Task<ProductResponseDTO?> GetByIdAsync(int id)
         {
-            return await _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdAsync(id);
+
+            return product == null ? null : MapProduct(product);
+        }
+
+        public async Task<List<ProductResponseDTO>> GetPublicProductsAsync()
+        {
+            var products = await _productRepository.GetAllAsync();
+
+            return products
+                .Where(product => product.IsActive && product.Category?.IsActive != false)
+                .Select(MapProduct)
+                .ToList();
+        }
+
+        public async Task<ProductResponseDTO?> GetPublicProductByIdAsync(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+
+            return product == null || !product.IsActive || product.Category?.IsActive == false
+                ? null
+                : MapProduct(product);
         }
 
         public async Task CreateAsync(CreateProductDTO dto)
@@ -45,7 +68,7 @@ namespace KidStore.Application.Services
                     SizeId = x.SizeId,
                     ColorId = x.ColorId,
                     StockQuantity = x.StockQuantity,
-                    
+                    ExtraPrice = x.ExtraPrice
                 }).ToList(),
 
                 Images = dto.Images.Select(x => new ProductImage
@@ -115,6 +138,39 @@ namespace KidStore.Application.Services
             return true;
         }
 
+        private static ProductResponseDTO MapProduct(Product product)
+        {
+            return new ProductResponseDTO
+            {
+                Id = product.Id,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category?.Name,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                DiscountPrice = product.DiscountPrice,
+                IsActive = product.IsActive,
+                CreatedAt = product.CreatedAt,
+                UpdatedAt = product.UpdatedAt,
+                Variants = product.Variants.Select(variant => new ProductVariantResponseDTO
+                {
+                    Id = variant.Id,
+                    SizeId = variant.SizeId,
+                    SizeName = variant.Size?.Name,
+                    ColorId = variant.ColorId,
+                    ColorName = variant.Color?.Name,
+                    StockQuantity = variant.StockQuantity,
+                    ExtraPrice = variant.ExtraPrice
+                }).ToList(),
+                Images = product.Images.Select(image => new ProductImageResponseDTO
+                {
+                    Id = image.Id,
+                    ImageUrl = image.ImageUrl,
+                    IsMain = image.IsMain,
+                    SortOrder = image.SortOrder
+                }).ToList()
+            };
+        }
 
     }
 }

@@ -27,13 +27,13 @@ namespace KidStore.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users
-                .FirstOrDefaultAsync(x => x.Email == email);
+                .FirstOrDefaultAsync(x => x.Email.ToLower() == email);
         }
 
         public async Task<bool> ExistsByEmailAsync(string email)
         {
             return await _context.Users
-                .AnyAsync(x => x.Email == email);
+                .AnyAsync(x => x.Email.ToLower() == email);
         }
 
         public async Task<User> AddAsync(User user)
@@ -52,24 +52,44 @@ namespace KidStore.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task<RefreshToken?> GetActiveRefreshTokenByHashAsync(string tokenHash)
+        public async Task<RefreshToken?> GetActiveRefreshTokenByHashAsync(string tokenHash)
         {
-            throw new NotImplementedException();
+            return await _context.RefreshTokens
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x =>
+                    x.TokenHash == tokenHash
+                    && !x.IsRevoked
+                    && x.ExpiresAt > DateTime.UtcNow);
         }
 
-        public Task AddRefreshTokenAsync(RefreshToken token)
+        public async Task AddRefreshTokenAsync(RefreshToken token)
         {
-            throw new NotImplementedException();
+            await _context.RefreshTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
         }
 
-        public Task RevokeRefreshTokenAsync(RefreshToken token, string? revokedByIp = null)
+        public async Task RevokeRefreshTokenAsync(RefreshToken token, string? revokedByIp = null)
         {
-            throw new NotImplementedException();
+            token.IsRevoked = true;
+            token.RevokedAt = DateTime.UtcNow;
+            token.RevokedByIp = revokedByIp;
+
+            await _context.SaveChangesAsync();
         }
 
-        public Task RevokeAllRefreshTokensAsync(int userId)
+        public async Task RevokeAllRefreshTokensAsync(int userId)
         {
-            throw new NotImplementedException();
+            var tokens = await _context.RefreshTokens
+                .Where(x => x.UserId == userId && !x.IsRevoked)
+                .ToListAsync();
+
+            foreach (var token in tokens)
+            {
+                token.IsRevoked = true;
+                token.RevokedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

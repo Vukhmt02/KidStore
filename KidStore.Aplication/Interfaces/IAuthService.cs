@@ -27,5 +27,8 @@ namespace KidStore.Application.Interfaces
 
         /// <summary>Lấy thông tin người dùng hiện tại.</summary>
         Task<UserInfoDto> GetMeAsync(int userId);
+
+        /// <summary>Cập nhật thông tin cá nhân người dùng hiện tại.</summary>
+        Task<UserInfoDto> UpdateProfileAsync(int userId, UpdateProfileDto dto);
     }
 }

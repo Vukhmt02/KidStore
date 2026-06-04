@@ -1,10 +1,12 @@
 ﻿using KidStore.Application.DTO;
 using KidStore.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KidStore.API.Controllers.Admin;
 [ApiController]
 [Route("api/admin/categories")]
+[Authorize(Roles = "1")]
 public class CategoriesController : ControllerBase
 {
     private readonly CategoryService _categoryService;

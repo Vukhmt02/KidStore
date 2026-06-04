@@ -1,6 +1,10 @@
 import { apiRequest } from "./api";
 
 export const catalogService = {
+  getPublicCategories: () => apiRequest("/catalog/categories"),
+
+  getPublicProducts: () => apiRequest("/catalog/products"),
+
   getCategories: () => apiRequest("/admin/categories"),
 
   createCategory: (data) =>
