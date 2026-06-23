@@ -18,6 +18,7 @@ namespace KidStore.Infrastructure.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<NewsArticle> NewsArticles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +64,15 @@ namespace KidStore.Infrastructure.Data
                 .WithMany(x => x.OrderItems)
                 .HasForeignKey(x => x.ProductVariantId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NewsArticle>(entity =>
+            {
+                entity.Property(x => x.Title).HasMaxLength(250);
+                entity.Property(x => x.Slug).HasMaxLength(250);
+                entity.Property(x => x.YoutubeVideoId).HasMaxLength(32);
+
+                entity.HasIndex(x => x.Slug).IsUnique();
+            });
         }
     }
 }
