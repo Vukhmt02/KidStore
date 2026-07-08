@@ -7,6 +7,7 @@ import { authService } from "../services/authService";
 const navItems = [
   { label: "Trang chủ", href: "/" },
   { label: "Sản phẩm", href: "/products" },
+  { label: "Tin tức", href: "/news" },
   { label: "Giỏ hàng", href: "/cart" }
 ];
 
@@ -75,7 +76,7 @@ export default function Navbar() {
         setCurrentUser(user);
         setProfileError("");
       } catch (error) {
-        setProfileError(error.message || "Khong the tai thong tin tai khoan.");
+        setProfileError(error.message || "Không thể tải thông tin tài khoản.");
       }
     }
 
@@ -117,7 +118,7 @@ export default function Navbar() {
           <Link
             to="/products"
             className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-cocoa transition hover:text-berry"
-            aria-label="Tim kiem"
+            aria-label="Tìm kiếm"
           >
             <Search size={19} />
           </Link>
@@ -127,7 +128,7 @@ export default function Navbar() {
               type="button"
               onClick={handleProfileClick}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-cocoa transition hover:text-berry"
-              aria-label="Tai khoan"
+              aria-label="Tài khoản"
             >
               <User size={19} />
             </button>
@@ -146,8 +147,8 @@ export default function Navbar() {
 
                 <div className="mt-4 grid gap-3 rounded-2xl bg-cream px-4 py-4 text-sm text-cocoa/75">
                   <ProfileRow label="Email" value={currentUser.email} />
-                  <ProfileRow label="So dien thoai" value={currentUser.phoneNumber} />
-                  <ProfileRow label="Dia chi" value={currentUser.address} />
+                  <ProfileRow label="Số điện thoại" value={currentUser.phoneNumber} />
+                  <ProfileRow label="Địa chỉ" value={currentUser.address} />
                 </div>
 
                 <Link
@@ -155,7 +156,7 @@ export default function Navbar() {
                   onClick={() => setProfileOpen(false)}
                   className="mt-4 block rounded-full bg-berry px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-cocoa"
                 >
-                  Xem tai khoan
+                  Xem tài khoản
                 </Link>
 
                 {Number(currentUser.role) === 1 && (
@@ -164,7 +165,7 @@ export default function Navbar() {
                     onClick={() => setProfileOpen(false)}
                     className="mt-4 block rounded-full bg-cocoa px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-berry"
                   >
-                    Vao trang quan tri
+                    Vào trang quản trị
                   </Link>
                 )}
 
@@ -174,7 +175,7 @@ export default function Navbar() {
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-cocoa/10 px-4 py-3 text-sm font-bold text-cocoa transition hover:bg-cream"
                 >
                   <LogOut size={16} />
-                  Dang xuat
+                  Đăng xuất
                 </button>
 
                 {profileError && <p className="mt-3 text-sm font-semibold text-berry">{profileError}</p>}
@@ -185,7 +186,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             className="relative flex h-11 w-11 items-center justify-center rounded-full bg-cocoa text-white transition hover:bg-berry"
-            aria-label="Gio hang"
+            aria-label="Giỏ hàng"
           >
             <ShoppingBag size={19} />
             {totalQuantity > 0 && (
@@ -200,7 +201,7 @@ export default function Navbar() {
           type="button"
           className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-cocoa md:hidden"
           onClick={() => setOpen((value) => !value)}
-          aria-label="Mo menu"
+          aria-label="Mở menu"
         >
           {open ? <X size={21} /> : <Menu size={21} />}
         </button>
@@ -235,12 +236,12 @@ export default function Navbar() {
                     await handleLogout();
                   }}
                 >
-                  Dang xuat
+                  Đăng xuất
                 </button>
               </>
             ) : (
               <NavLink to="/login" className={navClass} onClick={() => setOpen(false)}>
-                Dang nhap
+                Đăng nhập
               </NavLink>
             )}
           </nav>
@@ -273,7 +274,7 @@ function ProfileRow({ label, value }) {
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-cocoa/40">{label}</p>
-      <p className="mt-1 font-semibold text-cocoa">{value || "Chua cap nhat"}</p>
+      <p className="mt-1 font-semibold text-cocoa">{value || "Chưa cập nhật"}</p>
     </div>
   );
 }

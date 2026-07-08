@@ -1,4 +1,4 @@
-import { BarChart3, Boxes, FolderTree, Home, LogOut, Menu, Package, ShoppingCart, Users, X } from "lucide-react";
+import { BarChart3, Boxes, FolderTree, Home, LogOut, Menu, Newspaper, Package, ShoppingCart, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
@@ -8,7 +8,8 @@ const adminNav = [
   { label: "Sản phẩm", href: "/admin/products", icon: Package },
   { label: "Đơn hàng", href: "/admin/orders", icon: ShoppingCart },
   { label: "Khách hàng", href: "/admin/customers", icon: Users },
-  { label: "Danh mục", href: "/admin/categories", icon: FolderTree }
+  { label: "Danh mục", href: "/admin/categories", icon: FolderTree },
+  { label: "Tin tức", href: "/admin/news", icon: Newspaper }
 ];
 
 export default function AdminLayout() {
@@ -162,12 +163,4 @@ export default function AdminLayout() {
       </div>
     </div>
   );
-}
-
-function getCurrentUser() {
-  try {
-    return JSON.parse(localStorage.getItem("currentUser") || "null");
-  } catch {
-    return null;
-  }
 }
