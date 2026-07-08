@@ -22,18 +22,18 @@ export default function Home() {
 
       <section className="container-page py-8">
         <div className="grid gap-4 md:grid-cols-3">
-          <TrustItem icon={Shirt} title="Form de mac" text="Thiet ke thoai mai cho be van dong moi ngay." />
-          <TrustItem icon={PackageCheck} title="Goi hang can than" text="Dong goi gon dep, san sang lam qua tang." />
-          <TrustItem icon={HeartHandshake} title="Ho tro doi size" text="Tu van size va doi tra nhanh khi can." />
+          <TrustItem icon={Shirt} title="Form dễ mặc" text="Thiết kế thoải mái cho bé vận động mỗi ngày." />
+          <TrustItem icon={PackageCheck} title="Gói hàng cẩn thận" text="Đóng gói gọn đẹp, sẵn sàng làm quà tặng." />
+          <TrustItem icon={HeartHandshake} title="Hỗ trợ đổi size" text="Tư vấn size và đổi trả nhanh khi cần" />
         </div>
       </section>
 
       <section className="container-page py-10">
         <SectionHeader
-          eyebrow="Mua sam theo nhu cau"
-          title="Danh muc noi bat"
-          text="Chon nhanh nhom san pham phu hop voi do tuoi va phong cach cua be."
-          actionLabel="Xem tat ca"
+          eyebrow="Mua sắm theo nhu cầu"
+          title="Danh mục nổi bật"
+          text="Chọn nhanh nhóm sản phẩm phù hợp với độ tuổi và phong cách của bé"
+          actionLabel="Xem tất cả"
           actionHref="/products"
         />
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -45,10 +45,10 @@ export default function Home() {
 
       <section className="container-page py-10">
         <SectionHeader
-          eyebrow="Vua len ke"
-          title="San pham moi"
-          text="Cac mau moi duoc cap nhat tu catalog KidStore."
-          actionLabel="Di toi cua hang"
+          eyebrow="Vừa lên kệ"
+          title="Sản phẩm mới"
+          // text="Cac mau moi duoc cap nhat tu catalog KidStore."
+          actionLabel="Đi tới cửa hàng"
           actionHref="/products"
         />
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,10 +62,10 @@ export default function Home() {
 
       <section className="container-page py-10">
         <SectionHeader
-          eyebrow="Duoc yeu thich"
-          title="San pham ban chay"
-          text="Nhung mon hang phu huynh thuong chon khi mua cho be."
-          actionLabel="Xem them"
+          eyebrow="Được yêu thích"
+          title="Sản phẩm bán chạy"
+          text="Những món hàng bán chạy"
+          actionLabel="Xem thêm"
           actionHref="/products"
         />
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -19,7 +19,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="mt-5 max-w-xl text-base leading-8 text-cocoa/75 sm:text-lg">
-              Quan ao tre em mem mai, de phoi va thoai mai cho be di hoc, di choi va o nha.
+              Quần áo trẻ em mềm mại, dễ phối, thoải mái cho bé đi học đi chơi và ở nhà.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -36,9 +36,9 @@ export default function HeroSection() {
             </div>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3">
-              <HeroStat icon={Truck} title="Giao nhanh" text="Noi thanh 1-2 ngay" />
-              <HeroStat icon={ShieldCheck} title="Chat lieu em" text="Cotton thoang mem" />
-              <HeroStat icon={Sparkles} title="De doi tra" text="Ho tro doi size" />
+              <HeroStat icon={Truck} title="Giao nhanh" text="Nội thành 1-2 ngày" />
+              <HeroStat icon={ShieldCheck} title="Chất liệu êm" text="Cotton thoáng mềm" />
+              <HeroStat icon={Sparkles} title="Dễ đổi trả" text="Hỗ trợ đổi size" />
             </div>
           </div>
 
@@ -50,9 +50,9 @@ export default function HeroSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#fdf1e6] via-[#fdf1e6]/20 to-transparent lg:hidden" />
             <div className="absolute bottom-6 left-6 right-6 max-w-sm rounded-[1.5rem] bg-white/90 p-5 shadow-soft backdrop-blur">
-              <p className="text-sm font-black text-cocoa">Set do he moi</p>
+              <p className="text-sm font-black text-cocoa">Set đồ hè mới</p>
               <p className="mt-1 text-sm leading-6 text-cocoa/70">
-                Mau sac tuoi, form rong vua du cho be van dong ca ngay.
+                Màu sắc tươi, form rộng vừa đủ cho bé vận động cả ngày.
               </p>
             </div>
           </div>

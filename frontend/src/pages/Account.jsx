@@ -24,7 +24,7 @@ export default function Account() {
         replace: true,
         state: {
           from: "/account",
-          message: "Vui long dang nhap de xem tai khoan."
+          message: "Vui lòng đăng nhập để xem tài khoản"
         }
       });
       return;
