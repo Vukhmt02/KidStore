@@ -25,7 +25,7 @@ export function CatalogProvider({ children }) {
       try {
         const [categoryData, productData] = await Promise.all([
           catalogService.getPublicCategories(),
-          catalogService.getPublicProducts()
+          catalogService.getPublicProducts({ page: 1, pageSize: 100 })
         ]);
 
         if (ignore) return;
@@ -76,7 +76,7 @@ function normalizeCategories(data) {
   }));
 }
 
-function normalizeProducts(data) {
+export function normalizeProducts(data) {
   return normalizeList(data).map((product) => {
     const images = [...(product.images ?? [])].sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
     const variants = product.variants ?? [];

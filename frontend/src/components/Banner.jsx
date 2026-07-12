@@ -12,12 +12,11 @@ export default function Banner() {
             Ưu đãi trong tuần
           </div>
           <h2 className="mt-5 max-w-lg text-3xl font-black tracking-normal text-cocoa sm:text-4xl">
-            Giả giá các sét đồ cho bé đi học và đi chơi
+            Giảm giá các sét đồ cho bé đi học và đi chơi
           </h2>
           <p className="mt-4 max-w-md text-sm leading-7 text-cocoa/75 sm:text-base">
-            Chon nhanh outfit cho be voi mau sac de mac, chat vai thoang va du size pho bien.
+            Chọn nhanh outfit cho bé với màu sắc dễ mặc, chất vải thoáng và đủ size phổ biến. 
           </p>
-
           <div className="mt-6 grid max-w-md gap-3 sm:grid-cols-2">
             <BannerPoint icon={Tags} text="Nhiều mẫu đang có sẵn" />
             <BannerPoint icon={Sparkles} text="Chất liệu mềm mại" />

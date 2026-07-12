@@ -16,6 +16,24 @@ public class ProductResponseDTO
     public List<ProductImageResponseDTO> Images { get; set; } = new();
 }
 
+public class ProductQueryDTO
+{
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 6;
+    public string? Search { get; set; }
+    public int? CategoryId { get; set; }
+    public string? Sort { get; set; }
+}
+
+public class PagedResultDTO<T>
+{
+    public List<T> Items { get; set; } = new();
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int TotalItems { get; set; }
+    public int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
+}
+
 public class ProductVariantResponseDTO
 {
     public int Id { get; set; }

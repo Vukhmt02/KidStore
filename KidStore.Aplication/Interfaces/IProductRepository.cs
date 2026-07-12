@@ -1,15 +1,13 @@
-﻿using KidStore.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using KidStore.Application.DTO;
+using KidStore.Domain.Entities;
 
 namespace KidStore.Application.Interfaces;
 
 public interface IProductRepository
 {
     Task<List<Product>> GetAllAsync();
+
+    Task<(List<Product> Items, int TotalItems)> GetPublicPagedAsync(ProductQueryDTO query);
 
     Task<Product?> GetByIdAsync(int id);
 
@@ -20,5 +18,4 @@ public interface IProductRepository
     Task DeleteAsync(Product product);
 
     Task SaveChangesAsync();
-
 }

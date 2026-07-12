@@ -1,3 +1,4 @@
+using KidStore.Application.DTO;
 using KidStore.Application.Services;
 using KidStore.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,9 @@ public class CatalogController : ControllerBase
     }
 
     [HttpGet("products")]
-    public async Task<IActionResult> GetProducts()
+    public async Task<IActionResult> GetProducts([FromQuery] ProductQueryDTO query)
     {
-        return Ok(await _productService.GetPublicProductsAsync());
+        return Ok(await _productService.GetPublicProductsAsync(query));
     }
 
     [HttpGet("products/{id:int}")]

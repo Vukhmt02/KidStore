@@ -31,7 +31,15 @@ function getErrorMessage(data) {
     return isServerStackTrace ? "Hệ thống đang gặp lỗi. Vui lòng thử lại sau." : data;
   }
 
-  return data.message || data.title || data.error || "API request failed";
+  if (data.message || data.Message) return data.message || data.Message;
+  if (data.title || data.error) return data.title || data.error;
+
+  if (data.errors && typeof data.errors === "object") {
+    const messages = Object.values(data.errors).flat().filter(Boolean);
+    if (messages.length) return messages.join(" ");
+  }
+
+  return "API request failed";
 }
 
 export async function apiRequest(endpoint, options = {}) {

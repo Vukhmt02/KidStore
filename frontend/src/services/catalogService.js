@@ -3,7 +3,20 @@ import { apiRequest } from "./api";
 export const catalogService = {
   getPublicCategories: () => apiRequest("/catalog/categories"),
 
-  getPublicProducts: () => apiRequest("/catalog/products"),
+  getPublicProducts: ({ page = 1, pageSize = 12, search = "", categoryId = "", sort = "" } = {}) => {
+    const params = new URLSearchParams();
+
+    params.set("page", page);
+    params.set("pageSize", pageSize);
+
+    if (search) params.set("search", search);
+    if (categoryId) params.set("categoryId", categoryId);
+    if (sort) params.set("sort", sort);
+
+    return apiRequest(`/catalog/products?${params.toString()}`);
+  },
+
+  getPublicProduct: (id) => apiRequest(`/catalog/products/${id}`),
 
   getCategories: () => apiRequest("/admin/categories"),
 

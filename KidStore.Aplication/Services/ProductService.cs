@@ -42,6 +42,24 @@ namespace KidStore.Application.Services
                 .ToList();
         }
 
+        public async Task<PagedResultDTO<ProductResponseDTO>> GetPublicProductsAsync(ProductQueryDTO query)
+        {
+            var page = Math.Max(query.Page, 1);
+            var pageSize = Math.Clamp(query.PageSize, 1, 60);
+            query.Page = page;
+            query.PageSize = pageSize;
+
+            var (items, totalItems) = await _productRepository.GetPublicPagedAsync(query);
+
+            return new PagedResultDTO<ProductResponseDTO>
+            {
+                Items = items.Select(MapProduct).ToList(),
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+        }
+
         public async Task<ProductResponseDTO?> GetPublicProductByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
