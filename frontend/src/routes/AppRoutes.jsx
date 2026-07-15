@@ -15,6 +15,7 @@ import Login from "../pages/Login";
 import NotFound from "../pages/NotFound";
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
+import OrderSuccess from "../pages/OrderSuccess";
 import ProductDetail from "../pages/ProductDetail";
 import ProductList from "../pages/ProductList";
 import Register from "../pages/Register";
@@ -39,6 +40,7 @@ export default function AppRoutes() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
