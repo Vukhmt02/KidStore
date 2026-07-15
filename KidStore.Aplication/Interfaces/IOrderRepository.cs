@@ -8,7 +8,11 @@ namespace KidStore.Application.Interfaces
 
         Task<List<Order>> GetByUserIdAsync(int userId);
 
+        Task<List<Order>> GetAllAsync();
+
         Task AddAsync(Order order);
+
+        Task UpdateAsync(Order order);
 
         Task SaveChangesAsync();
     }

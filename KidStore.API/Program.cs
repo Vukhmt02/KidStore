@@ -1,8 +1,9 @@
-﻿using KidStore.API.Middleware;
+using KidStore.API.Middleware;
 using KidStore.Application.Interfaces;
 using KidStore.Application.Services;
 using KidStore.Infrastructure.Data;
 using KidStore.Infrastructure.Repositories;
+using KidStore.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<NewsService>();
+builder.Services.AddScoped<DashboardService>();
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>

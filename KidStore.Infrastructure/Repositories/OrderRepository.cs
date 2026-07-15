@@ -17,7 +17,9 @@ namespace KidStore.Infrastructure.Repositories
         public async Task<Order?> GetByIdAsync(int id)
         {
             return await _context.Orders
+                .Include(order => order.User)
                 .Include(order => order.Items)
+                    .ThenInclude(item => item.ProductVariant)
                 .FirstOrDefaultAsync(order => order.Id == id);
         }
 
@@ -30,9 +32,24 @@ namespace KidStore.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Order>> GetAllAsync()
+        {
+            return await _context.Orders
+                .Include(order => order.User)
+                .Include(order => order.Items)
+                .OrderByDescending(order => order.CreatedAt)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
+        }
+
+        public Task UpdateAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            return Task.CompletedTask;
         }
 
         public async Task SaveChangesAsync()

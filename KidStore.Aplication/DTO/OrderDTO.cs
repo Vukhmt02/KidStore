@@ -13,11 +13,18 @@ namespace KidStore.Application.DTO
         public string PaymentMethod { get; set; } = "COD";
     }
 
+    public class UpdateOrderStatusDTO
+    {
+        public string Status { get; set; } = string.Empty;
+    }
+
     public class OrderResponseDTO
     {
         public int Id { get; set; }
 
         public int UserId { get; set; }
+
+        public string? CustomerEmail { get; set; }
 
         public string CustomerName { get; set; } = string.Empty;
 

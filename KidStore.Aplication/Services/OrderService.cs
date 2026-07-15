@@ -9,6 +9,9 @@ namespace KidStore.Application.Services
     {
         private const decimal ShippingFee = 25000m;
 
+        private static readonly string[] ValidStatuses =
+            { "Pending", "Confirmed", "Shipping", "Delivered", "Cancelled" };
+
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
 
@@ -17,6 +20,8 @@ namespace KidStore.Application.Services
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
         }
+
+        // ── Customer ──────────────────────────────────────────────
 
         public async Task<OrderResponseDTO> CreateFromCartAsync(int userId, CreateOrderDTO dto)
         {
@@ -108,6 +113,64 @@ namespace KidStore.Application.Services
             return MapOrder(order);
         }
 
+        // ── Admin ─────────────────────────────────────────────────
+
+        public async Task<List<OrderResponseDTO>> GetAllOrdersAsync()
+        {
+            var orders = await _orderRepository.GetAllAsync();
+
+            return orders.Select(MapOrder).ToList();
+        }
+
+        public async Task<OrderResponseDTO> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId)
+                ?? throw new NotFoundException("Đơn hàng", orderId);
+
+            return MapOrder(order);
+        }
+
+        public async Task<OrderResponseDTO> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusDTO dto)
+        {
+            var newStatus = dto.Status?.Trim();
+
+            if (string.IsNullOrWhiteSpace(newStatus) || !ValidStatuses.Contains(newStatus))
+            {
+                throw new ApplicationValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        ["status"] = new[] { $"Trạng thái không hợp lệ. Các trạng thái cho phép: {string.Join(", ", ValidStatuses)}" }
+                    });
+            }
+
+            var order = await _orderRepository.GetByIdAsync(orderId)
+                ?? throw new NotFoundException("Đơn hàng", orderId);
+
+            if (order.Status == "Delivered" || order.Status == "Cancelled")
+            {
+                throw new ConflictException($"Không thể cập nhật đơn hàng đã ở trạng thái '{order.Status}'.");
+            }
+
+            // Hoàn trả tồn kho khi hủy đơn
+            if (newStatus == "Cancelled" && order.Status != "Cancelled")
+            {
+                foreach (var item in order.Items)
+                {
+                    item.ProductVariant.StockQuantity += item.Quantity;
+                }
+            }
+
+            order.Status = newStatus;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            await _orderRepository.UpdateAsync(order);
+            await _orderRepository.SaveChangesAsync();
+
+            return MapOrder(order);
+        }
+
+        // ── Private helpers ───────────────────────────────────────
+
         private static void ValidateOrder(CreateOrderDTO dto)
         {
             var errors = new Dictionary<string, string[]>();
@@ -141,6 +204,7 @@ namespace KidStore.Application.Services
             {
                 Id = order.Id,
                 UserId = order.UserId,
+                CustomerEmail = order.User?.Email,
                 CustomerName = order.CustomerName,
                 PhoneNumber = order.PhoneNumber,
                 ShippingAddress = order.ShippingAddress,
@@ -167,3 +231,4 @@ namespace KidStore.Application.Services
         }
     }
 }
+

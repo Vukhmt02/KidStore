@@ -1,12 +1,7 @@
-﻿using KidStore.Application.Interfaces;
+using KidStore.Application.Interfaces;
 using KidStore.Domain.Entities;
 using KidStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KidStore.Infrastructure.Repositories
 {
@@ -39,18 +34,56 @@ namespace KidStore.Infrastructure.Repositories
         public async Task<User> AddAsync(User user)
         {
             _context.Users.Add(user);
-
             await _context.SaveChangesAsync();
-
             return user;
         }
 
         public async Task UpdateAsync(User user)
         {
             _context.Users.Update(user);
-
             await _context.SaveChangesAsync();
         }
+
+        // ── Admin ─────────────────────────────────────────────────
+
+        public async Task<List<User>> GetAllCustomersAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Role == 0)
+                .Include(u => u.Orders)
+                .OrderByDescending(u => u.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<bool> ToggleActiveAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null || user.Role == 1)
+                return false;
+
+            user.IsActive = !user.IsActive;
+
+            // Thu hồi tất cả refresh token khi khóa tài khoản
+            if (!user.IsActive)
+            {
+                var tokens = await _context.RefreshTokens
+                    .Where(t => t.UserId == userId && !t.IsRevoked)
+                    .ToListAsync();
+
+                foreach (var token in tokens)
+                {
+                    token.IsRevoked = true;
+                    token.RevokedAt = DateTime.UtcNow;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // ── RefreshToken ──────────────────────────────────────────
 
         public async Task<RefreshToken?> GetActiveRefreshTokenByHashAsync(string tokenHash)
         {
@@ -73,7 +106,6 @@ namespace KidStore.Infrastructure.Repositories
             token.IsRevoked = true;
             token.RevokedAt = DateTime.UtcNow;
             token.RevokedByIp = revokedByIp;
-
             await _context.SaveChangesAsync();
         }
 
