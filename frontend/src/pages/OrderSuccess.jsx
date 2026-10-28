@@ -2,6 +2,7 @@ import { CheckCircle2, Copy, Download, Home, Package } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { formatCurrency } from "../utils/formatCurrency";
+import { CartStepsHeader } from "./Cart";
 
 const BANK = {
   id: "vcb",
@@ -55,8 +56,9 @@ export default function OrderSuccess() {
   };
 
   return (
-    <section className="container-page py-10">
+    <section className="container-page py-6 sm:py-10">
       <div className="mx-auto max-w-2xl">
+        <CartStepsHeader activeStep={3} />
 
         {/* Success header */}
         <div className="text-center">

@@ -7,6 +7,7 @@ import Input from "../components/Input";
 import { useCart } from "../hooks/useCart";
 import { orderService } from "../services/orderService";
 import { formatCurrency } from "../utils/formatCurrency";
+import { CartStepsHeader } from "./Cart";
 
 const BANK = {
   id: "vcb",
@@ -105,7 +106,8 @@ export default function Checkout() {
   }
 
   return (
-    <section className="container-page py-10">
+    <section className="container-page py-6 sm:py-10">
+      <CartStepsHeader activeStep={2} />
       <h1 className="section-title">Thanh toán</h1>
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         <form

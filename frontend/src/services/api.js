@@ -45,21 +45,33 @@ function getErrorMessage(data) {
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("accessToken");
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers
-    },
-    ...options
-  });
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers
+      },
+      ...options
+    });
 
-  const data = await parseResponse(response);
+    const data = await parseResponse(response);
 
-  if (!response.ok) {
-    throw new ApiError(getErrorMessage(data), response.status, data);
+    if (!response.ok) {
+      throw new ApiError(getErrorMessage(data), response.status, data);
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error("Lỗi kết nối API:", `${API_URL}${endpoint}`, error);
+    throw new ApiError(
+      `Không thể kết nối đến Backend (${API_URL}). Vui lòng đảm bảo Backend API đang chạy tại cổng tương ứng.`,
+      0,
+      null
+    );
   }
-
-  return data;
 }
