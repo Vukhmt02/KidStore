@@ -1,4 +1,4 @@
-import {
+﻿import {
   AlertCircle,
   BarChart3,
   CheckCircle2,
@@ -250,6 +250,69 @@ export default function AdminDashboard() {
               <BarChart3 size={22} className="text-berry/60" />
             </div>
             <RevenueChart data={stats.revenueChart} />
+          </section>
+
+          {/* Low stock alert */}
+          <section className="rounded-[1.5rem] border border-amber-200 bg-amber-50/40 p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-800">
+                <AlertCircle size={20} className="text-amber-600" />
+                <h3 className="text-lg font-black text-cocoa">Cảnh báo tồn kho thấp (≤ 5)</h3>
+              </div>
+              <Link
+                to="/admin/products"
+                className="text-xs font-bold text-amber-700 hover:text-cocoa transition"
+              >
+                Nhập thêm hàng →
+              </Link>
+            </div>
+            {(!stats.lowStockProducts || stats.lowStockProducts.length === 0) ? (
+              <p className="py-4 text-center text-sm font-medium text-emerald-700">
+                ✓ Tất cả sản phẩm đều có số lượng tồn kho an toàn!
+              </p>
+            ) : (
+              <div className="grid gap-2.5">
+                {stats.lowStockProducts.map((item, idx) => (
+                  <div
+                    key={`${item.productId}-${idx}`}
+                    className="flex items-center justify-between gap-3 rounded-2xl bg-white p-3 border border-amber-200/70 shadow-sm"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.productName}
+                          className="h-11 w-11 rounded-xl object-cover shrink-0 border border-cocoa/10"
+                        />
+                      ) : (
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-peach text-cocoa font-bold text-xs shrink-0">
+                          SP
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-cocoa">{item.productName}</p>
+                        <p className="text-xs text-cocoa/55">
+                          Size: <span className="font-semibold text-cocoa">{item.sizeName}</span> · Màu:{" "}
+                          <span className="font-semibold text-cocoa">{item.ColorName || item.colorName}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span
+                        className={`inline-block rounded-xl px-2.5 py-1 text-xs font-black ${
+                          item.stockQuantity === 0
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {item.stockQuantity === 0 ? "Hết hàng (0)" : `Còn ${item.stockQuantity} sp`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Top products */}

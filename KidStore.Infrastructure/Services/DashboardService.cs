@@ -1,4 +1,4 @@
-using KidStore.Application.DTO;
+﻿using KidStore.Application.DTO;
 using KidStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -100,6 +100,29 @@ namespace KidStore.Infrastructure.Services
                 .Reverse()
                 .ToList();
 
+            // ── Cảnh báo tồn kho thấp (Stock <= 5) ─────────────
+            var lowStockProducts = await _context.Set<KidStore.Domain.Entities.ProductVariant>()
+                .Include(v => v.Product)
+                    .ThenInclude(p => p.Images)
+                .Include(v => v.Size)
+                .Include(v => v.Color)
+                .Where(v => v.StockQuantity <= 5 && v.Product.IsActive)
+                .OrderBy(v => v.StockQuantity)
+                .Take(10)
+                .Select(v => new LowStockProductDTO
+                {
+                    ProductId = v.ProductId,
+                    ProductName = v.Product.Name,
+                    ImageUrl = v.Product.Images
+                        .OrderByDescending(img => img.IsMain)
+                        .Select(img => img.ImageUrl)
+                        .FirstOrDefault(),
+                    SizeName = v.Size != null ? v.Size.Name : $"Size {v.SizeId}",
+                    ColorName = v.Color != null ? v.Color.Name : $"Color {v.ColorId}",
+                    StockQuantity = v.StockQuantity
+                })
+                .ToListAsync();
+
             return new DashboardStatsDTO
             {
                 TotalRevenue = totalRevenue,
@@ -122,7 +145,8 @@ namespace KidStore.Infrastructure.Services
 
                 RecentOrders = recentOrders,
                 TopProducts = topProducts,
-                RevenueChart = revenueChart
+                RevenueChart = revenueChart,
+                LowStockProducts = lowStockProducts
             };
         }
     }

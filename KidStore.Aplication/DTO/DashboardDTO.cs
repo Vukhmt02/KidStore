@@ -1,4 +1,4 @@
-namespace KidStore.Application.DTO
+﻿namespace KidStore.Application.DTO
 {
     public class DashboardStatsDTO
     {
@@ -31,6 +31,19 @@ namespace KidStore.Application.DTO
 
         // Doanh thu 7 ngày gần nhất
         public List<RevenueDayDTO> RevenueChart { get; set; } = new();
+
+        // Cảnh báo tồn kho thấp (Stock <= 5)
+        public List<LowStockProductDTO> LowStockProducts { get; set; } = new();
+    }
+
+    public class LowStockProductDTO
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
+        public string SizeName { get; set; } = string.Empty;
+        public string ColorName { get; set; } = string.Empty;
+        public int StockQuantity { get; set; }
     }
 
     public class RecentOrderDTO
