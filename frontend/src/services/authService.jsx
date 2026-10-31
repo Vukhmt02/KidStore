@@ -29,5 +29,11 @@ export const authService = {
     apiRequest("/auth/me", {
       method: "PUT",
       body: JSON.stringify(data)
+    }),
+
+  changePassword: (data) =>
+    apiRequest("/auth/change-password", {
+      method: "PUT",
+      body: JSON.stringify(data)
     })
 };

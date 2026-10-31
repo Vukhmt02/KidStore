@@ -1,4 +1,4 @@
-﻿using KidStore.Application.DTO;
+using KidStore.Application.DTO;
 using KidStore.Application.Interfaces;
 using KidStore.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -169,6 +169,9 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetByIdAsync(userId)
             ?? throw new NotFoundException("Người dùng", userId);
+
+        if (!string.IsNullOrWhiteSpace(dto.FullName))
+            user.FullName = dto.FullName.Trim();
 
         user.PhoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim();
         user.Address = string.IsNullOrWhiteSpace(dto.Address) ? null : dto.Address.Trim();
