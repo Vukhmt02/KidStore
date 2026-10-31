@@ -1,4 +1,4 @@
-using KidStore.API.Middleware;
+﻿using KidStore.API.Middleware;
 using KidStore.Application.Interfaces;
 using KidStore.Application.Services;
 using KidStore.Infrastructure.Data;
@@ -113,6 +113,7 @@ app.UseSwaggerUI();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseCors("AllowAll");
+app.UseStaticFiles();
 
 if (!app.Environment.IsDevelopment())
 {

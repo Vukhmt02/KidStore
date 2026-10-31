@@ -1,4 +1,5 @@
-import { Edit, Eye, EyeOff, Plus, Trash2, X } from "lucide-react";
+﻿import { Edit, Eye, EyeOff, Plus, Trash2, Upload, X } from "lucide-react";
+import { uploadService } from "../../services/uploadService";
 import { useEffect, useState } from "react";
 import Button from "../../components/Button";
 import { newsService } from "../../services/newsService";

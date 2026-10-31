@@ -1,4 +1,5 @@
-import { Edit, Plus, Search, Trash2, X } from "lucide-react";
+﻿import { Edit, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { uploadService } from "../../services/uploadService";
 import { useEffect, useMemo, useState } from "react";
 import Button from "../../components/Button";
 import { categories as initialCategories, products as initialProducts } from "../../data/products";
