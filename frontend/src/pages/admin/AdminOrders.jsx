@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Eye, Loader2, Package, RefreshCw, Search, X } from "lucide-react";
+﻿import { ChevronDown, ChevronUp, Eye, Loader2, Package, Printer, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { orderService } from "../../services/orderService";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -32,6 +32,132 @@ function formatDate(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function printInvoice(order) {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Vui lòng cho phép mở popup để in hóa đơn.");
+    return;
+  }
+
+  const itemsHtml = (order.items || [])
+    .map(
+      (item, idx) => `
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${idx + 1}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+        <strong>${item.productName}</strong>
+        ${item.sizeName || item.colorName ? `<br><small style="color: #666;">Phân loại: ${[item.sizeName, item.colorName].filter(Boolean).join(" - ")}</small>` : ""}
+      </td>
+      <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.unitPrice)}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right; font-weight: bold;">${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.lineTotal)}</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const formatVnd = (val) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(val || 0);
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+      <meta charset="utf-8">
+      <title>Hóa đơn đơn hàng #${order.id} - KidStore</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 24px; color: #333; line-height: 1.5; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #FF7FA3; padding-bottom: 16px; margin-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: 900; color: #5B4B45; }
+        .logo span { color: #FF7FA3; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+        th { background: #FFF8EC; color: #5B4B45; padding: 10px 8px; border-bottom: 2px solid #eee; text-align: left; }
+        .totals { margin-left: auto; width: 320px; font-size: 14px; }
+        .totals-row { display: flex; justify-content: space-between; padding: 6px 0; }
+        .grand-total { font-size: 16px; font-weight: bold; color: #FF7FA3; border-top: 1px solid #ddd; padding-top: 8px; }
+        .footer { margin-top: 40px; text-align: center; font-size: 13px; color: #777; border-top: 1px dashed #ddd; padding-top: 16px; }
+        @media print {
+          body { padding: 0; }
+          button { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <div class="logo">Kid<span>Store</span></div>
+          <div style="font-size: 13px; color: #666; margin-top: 4px;">Thời trang & phụ kiện cao cấp cho bé</div>
+        </div>
+        <div style="text-align: right;">
+          <h2 style="margin: 0; font-size: 18px; color: #333;">PHIẾU GIAO HÀNG / HÓA ĐƠN</h2>
+          <div style="font-weight: bold; color: #FF7FA3; margin-top: 4px;">Mã đơn: #${order.id}</div>
+          <div style="font-size: 12px; color: #888;">Ngày đặt: ${new Date(order.createdAt).toLocaleString("vi-VN")}</div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; margin-bottom: 4px;">NGƯỜI NHẬN HÀNG</div>
+          <div><strong>${order.customerName}</strong></div>
+          <div>SĐT: ${order.phoneNumber}</div>
+          <div>Địa chỉ: ${order.shippingAddress}</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; margin-bottom: 4px;">THÔNG TIN ĐƠN HÀNG</div>
+          <div>Phương thức thanh toán: <strong>${order.paymentMethod || "COD"}</strong></div>
+          <div>Trạng thái: <strong>${order.status}</strong></div>
+          ${order.note ? `<div>Ghi chú: ${order.note}</div>` : ""}
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 40px; text-align: center;">STT</th>
+            <th>Tên sản phẩm</th>
+            <th style="width: 70px; text-align: center;">SL</th>
+            <th style="width: 120px; text-align: right;">Đơn giá</th>
+            <th style="width: 130px; text-align: right;">Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-row">
+          <span>Tiền hàng:</span>
+          <span>${formatVnd(order.subtotal)}</span>
+        </div>
+        <div class="totals-row">
+          <span>Phí vận chuyển:</span>
+          <span>${formatVnd(order.shippingFee)}</span>
+        </div>
+        <div class="totals-row grand-total">
+          <span>TỔNG THANH TOÁN:</span>
+          <span>${formatVnd(order.totalPrice)}</span>
+        </div>
+      </div>
+
+      <div class="footer">
+        Cảm ơn quý khách đã mua sắm tại KidStore!<br>
+        Mọi thắc mắc về đơn hàng, vui lòng liên hệ hotline hỗ trợ.
+      </div>
+
+      <script>
+        window.onload = function() {
+          window.print();
+        };
+      </script>
+    </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
 }
 
 function formatDateTime(dateString) {
