@@ -1,7 +1,8 @@
-import { Route, Routes } from "react-router-dom";
+﻿import { Route, Routes } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import MainLayout from "../layouts/MainLayout";
 import AdminCategories from "../pages/admin/AdminCategories";
+import AdminCatalogOptions from "../pages/admin/AdminCatalogOptions";
 import AdminCustomers from "../pages/admin/AdminCustomers";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminNews from "../pages/admin/AdminNews";
@@ -29,6 +30,7 @@ export default function AppRoutes() {
         <Route path="orders" element={<AdminOrders />} />
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="categories" element={<AdminCategories />} />
+        <Route path="options" element={<AdminCatalogOptions />} />
         <Route path="news" element={<AdminNews />} />
       </Route>
       <Route element={<MainLayout />}>
